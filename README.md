@@ -16,6 +16,10 @@
 Create a cron job that checks whether there is a new url in the file games.txt.
 If any is found, do the necessary and get a pgn file out of the url.
 
+Merge the python files, so that it can extract data whilst sending the data to pgn
+files directly instead of the code first writing to txt files, then another code
+that converts the txt files to pgn files.
+
 
 -------------------------------------------------------------------------------------
 # What different files do...
