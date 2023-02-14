@@ -2,6 +2,7 @@
 
 """
 
+This python code reads in the text files and converts them to pgn files
 """
 
 import os
@@ -16,7 +17,9 @@ def format_data(data: str):
 def file_cleaner(file_name: str, new_file: str):
     """converts text files to pgn files"""
 
-    with open(file_name, 'r') as file, open(new_file, 'w') as new_f:
+    with open(file_name, 'r', encoding='utf8') as file,\
+            open(new_file, 'w', encoding='utf8') as new_f:
+
         data = file.read()
         data = data.replace('\n', ' ')
         new_f.write(data)

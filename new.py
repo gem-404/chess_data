@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+"""
+This is a simple script to demonstrate how to use the
+subprocess module to get the query string from the
+chromium browser that is already running on one's computer.
+
+"""
+
 # import dbus
 #
 # # Connect to the session bus
@@ -45,9 +52,9 @@ import subprocess
 
 output = subprocess.check_output(["wmctrl", "-a", "chromium"]).strip()
 
-subprocess.run(["notify-send", str(len(output))])
+subprocess.run(["notify-send", str(len(output))], check=True)
 
-subprocess.run(["notify-send", output])
+subprocess.run(["notify-send", output], check=True)
 
 # Parse the output to get the ID of the active window
 window_id = output.split()[0]
@@ -64,4 +71,4 @@ output = subprocess.check_output(["xprop", "-id",
 # print(output)
 # Print the URL
 
-subprocess.run(["notify-send", output])
+subprocess.run(["notify-send", output], check=True)
