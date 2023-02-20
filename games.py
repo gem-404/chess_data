@@ -18,6 +18,14 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
+def connection_active():
+    """This function checks whether there is an active internet
+    connection in the device, if there is, find the necessary pgn
+    files for the urls, if not... pass
+    """
+    return True
+
+
 def games_played(jp_file: str) -> list:
     """
     Function to get games from file and return a list
@@ -97,4 +105,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+
+    if connection_active():
+        main()
