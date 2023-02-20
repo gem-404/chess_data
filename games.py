@@ -7,13 +7,15 @@ from the games and save them to txt files for each game.
 The links will be found from duckduckgo.com.
 """
 
-from time import sleep
+import os
+
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 # from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 def games_played(jp_file: str) -> list:
@@ -25,6 +27,26 @@ def games_played(jp_file: str) -> list:
         games = file.read().splitlines()
 
     return games
+
+
+def check_unconverted_pgns():
+    """
+    Function to look for urls that are already converted to
+    pgns so as not to reconvert them.
+    """
+
+    url: str = "https://www.chess.com/game/live/"
+
+    all_games: list = [game.split("/")[-1]
+                       for game in games_played("./games.txt")]
+
+    games_analyzed = [game.split("-")[-1]
+                      for game in os.listdir("pgn/")]
+
+    non_analyzed = [url+game for game
+                    in all_games if game not in games_analyzed]
+
+    return non_analyzed
 
 
 EXECUTABLE_PATH = "/usr/bin/brave"
@@ -49,30 +71,29 @@ def main():
     Main function to login and search for links
     """
 
-    # Instantiate the jackpot file.
-    jackpot_file = "./games.txt"
+    # Check for games that have already been converted to pgn
+    games = check_unconverted_pgns()
 
-    # Collect the games to be played.
-    games = games_played(jackpot_file)
+    if not games:
+        return
 
     for game in games:
 
         query: str = game.rstrip()
-        filename: str = "pgn/" + query.split("/")[-1].lower() + ".txt"
-        print(filename)
+        filename: str = "pgn/data-" + query.split("/")[-1] + ".txt"
 
         driver.get(query)
-        sleep(5)
 
-        try:
-            moves = driver.find_element(By.ID, "move-list")
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "move-list"))
+        )
+        moves = driver.find_element(By.ID, "move-list")
 
-            # write the moves to a file
-            with open(filename, "w", encoding="utf-8") as file:
-                file.write(moves.text)
-
-        except NoSuchElementException:
-            print("No moves found for this game")
+        # write the moves to a file
+        with open(filename, "w", encoding="utf-8") as file:
+            moves = moves.text
+            moves = moves.replace("\n", " ")
+            file.write(moves)
 
 
 if __name__ == "__main__":
