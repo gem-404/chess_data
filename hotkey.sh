@@ -48,9 +48,9 @@ last_line=`tail -1 $file`
 new_lines=`cat $file | wc -l`
 
 if [ "$new_lines" -ge "$lines_in_file" ]; then
+
+    # we will need to check if a game was added by using a notify-send
     notify-send "Added a game" "Game $last_line was added..."
 
-    notify-send "This are the args" "$args"
 fi
 
-# we will need to check if a game was added by using a notify-send
