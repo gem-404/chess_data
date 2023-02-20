@@ -25,12 +25,6 @@
 #
 # fi
 
-# Copy the URL to the clipboard
-# echo -n "$url" | xclip -selection clipboard
-
-
-# notify-send "new url is $newurl"
-
 file=/home/ephantus/chess_data/games.txt
 
 # check how many lines $file currently has.
