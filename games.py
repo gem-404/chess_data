@@ -23,6 +23,7 @@ def connection_active():
     connection in the device, if there is, find the necessary pgn
     files for the urls, if not... pass
     """
+
     return True
 
 
