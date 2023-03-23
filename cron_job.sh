@@ -11,7 +11,7 @@ lines=`cat $file | wc -l`
 # sed -i '/^https:\/\/www\.[a-z]+\.[a-z]+\/[a-z]+\/[a-z]+\/[0-9]\+$/!d' $file
 
 # Check for duplicate lines and remove them
-cat $file | sort -u | uniq | tee $file > /dev/null
+sort $file | uniq > tmpfile && mv tmpfile $file
 
 # Check if any new lines have been added since last time
 while : do
@@ -20,12 +20,17 @@ while : do
         newlen=`wc -l $file | awk '{ print $1 }'`
         newlines=`expr $newlen - $lines`
 
-        python $pyfile
+        if [ $newlines -gt 0 ]; then
+            python $pyfile
+        fi
 
         lines=$newlen
 
         # Automatically add, commit and push the changed file to the git repo
         git add games.txt pgn/ ; git commit -m "Added a url to games.txt and a pgn file..."
+
+        sleep 300
+
     fi
 
 done
