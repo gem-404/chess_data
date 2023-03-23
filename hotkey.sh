@@ -27,4 +27,4 @@ fi
 # Remove all duplicate entries in the main file -> games.txt
 sort $file | uniq > tmpfile && mv tmpfile $file
 
-pyfile
+py pyfile
