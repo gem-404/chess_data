@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-
 """
 A module to login in to brave browser and search for links
 from the games and save them to txt files for each game.
 
 The links will be found from duckduckgo.com.
 """
-
 import os
 
-
+import requests
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 def connection_active():
@@ -22,8 +20,12 @@ def connection_active():
     connection in the device, if there is, find the necessary pgn
     files for the urls, if not... pass
     """
+    try:
+        _ = requests.get('https://www.google.com', timeout=1)
+        return True
 
-    return True
+    except requests.exceptions.RequestException:
+        return False
 
 
 def games_played(jp_file: str) -> list:
@@ -37,6 +39,7 @@ def games_played(jp_file: str) -> list:
     return games
 
 
+# TODO: Change this filepaths to add whether I played black or white.
 def check_unconverted_pgns():
     """
     Function to look for urls that are already converted to
@@ -45,11 +48,13 @@ def check_unconverted_pgns():
 
     url: str = "https://www.chess.com/game/live/"
 
-    all_games: list = [game.split("/")[-1]
-                       for game in games_played("./games.txt")]
+    games: list[str] = games_played("./games.txt")
 
-    games_analyzed = [game.split("-")[-1]
-                      for game in os.listdir("pgn/")]
+    all_games: list = [game.split("/")[-1]
+                       for game in games]
+
+    games_analyzed = [game.split("-")[-1].removesuffix(".txt")
+                      for game in os.listdir("pgn")]
 
     non_analyzed = [url+game for game
                     in all_games if game not in games_analyzed]
@@ -57,7 +62,7 @@ def check_unconverted_pgns():
     return non_analyzed
 
 
-EXECUTABLE_PATH = "/usr/bin/brave"
+EXECUTABLE_PATH = "/usr/bin/chromium"
 CHROME_DRIVER = "/usr/bin/chromedriver"
 
 service = Service(CHROME_DRIVER)
@@ -74,6 +79,21 @@ options.binary_location = EXECUTABLE_PATH
 driver = webdriver.Chrome(service=service, options=options)
 
 
+def check_if_black_or_white() -> str:
+    """
+    Function to check whether I played white or black
+    """
+
+    black = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "board flipped"))
+    )
+
+    if black:
+        return "black"
+
+    return "white"
+
+
 def main():
     """
     Main function to login and search for links
@@ -88,7 +108,6 @@ def main():
     for game in games:
 
         query: str = game.rstrip()
-        filename: str = "pgn/data-" + query.split("/")[-1] + ".txt"
 
         driver.get(query)
 
@@ -97,8 +116,11 @@ def main():
         )
         moves = driver.find_element(By.ID, "move-list")
 
+        game_color = check_if_black_or_white()
+
+        f_name: str = f"pgn/{game_color}-data-" + query.split("/")[-1] + ".txt"
         # write the moves to a file
-        with open(filename, "w", encoding="utf-8") as file:
+        with open(f_name, "w", encoding="utf-8") as file:
             moves = moves.text
             moves = moves.replace("\n", " ")
             file.write(moves)
@@ -108,3 +130,6 @@ if __name__ == "__main__":
 
     if connection_active():
         main()
+
+    else:
+        print("No internet connection")
