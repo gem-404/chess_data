@@ -81,17 +81,19 @@ driver = webdriver.Chrome(service=service, options=options)
 
 def check_if_black_or_white() -> str:
     """
-    Function to check whether I played white or black
+    Function to check whether I played as white or black
     """
 
-    black = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, "board flipped"))
+    color = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located(
+            (By.CLASS_NAME, "user-tagline-component")
+        )
     )
 
-    if black:
-        return "black"
+    username: str = "EphantusMash3727"
+    black: bool = username in color.text
 
-    return "white"
+    return "black" if black else "white"
 
 
 def main():
@@ -116,9 +118,9 @@ def main():
         )
         moves = driver.find_element(By.ID, "move-list")
 
-        game_color = check_if_black_or_white()
+        color = check_if_black_or_white()
 
-        f_name: str = f"pgn/{game_color}-data-" + query.split("/")[-1] + ".txt"
+        f_name: str = f"pgn/{color}-data-" + query.split("/")[-1] + ".txt"
         # write the moves to a file
         with open(f_name, "w", encoding="utf-8") as file:
             moves = moves.text
