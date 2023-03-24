@@ -82,6 +82,10 @@ driver = webdriver.Chrome(service=service, options=options)
 def check_if_black_or_white() -> str:
     """
     Function to check whether I played as white or black
+    Checks which username is given at the beginning... If your
+    username is given, you are playing as black,
+    (black is on top -> board and piece placement)
+    else, you are playing as white...
     """
 
     color = WebDriverWait(driver, 10).until(
@@ -90,6 +94,7 @@ def check_if_black_or_white() -> str:
         )
     )
 
+    # my username is EphantusMash3727
     username: str = "EphantusMash3727"
     black: bool = username in color.text
 
@@ -120,7 +125,7 @@ def main():
 
         color = check_if_black_or_white()
 
-        f_name: str = f"pgn/{color}-data-" + query.split("/")[-1] + ".txt"
+        f_name: str = f"pgn/{color}-data-" + query.split("/")[-1] + ".pgn"
         # write the moves to a file
         with open(f_name, "w", encoding="utf-8") as file:
             moves = moves.text
